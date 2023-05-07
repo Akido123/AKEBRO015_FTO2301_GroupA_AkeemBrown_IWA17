@@ -1,12 +1,4 @@
-// Summary:
-
-// HTML and CSS are provided. Don’t change these.
-// Use the provided CSS classes to style the created elements.
-// The current month and year should be displayed above the calendar.
-// Each week must be indicated in the left most column (Always starts with Week 1, Week 2 etc.).
-// Weeks should alternate between white and grey.
-// Each date of the month should be displayed under the corresponding weekday.
-// The current day should be highlighted in blue.
+// scripts.js
 
 const MONTHS = [
   'January',
@@ -25,50 +17,58 @@ const MONTHS = [
 
 const getDaysInMonth = (date) => new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
 
+// Only edit below 
+
 const createArray = (length) => {
   const result = []
 
   for (let i = 1; i < length + 1; i++) {
       result.push(i)
   }
+
   return result
 }
 
 const createData = () => {
-  const current = new Date()
-  current.setDate(1)
+  const current = new Date() 
+  const dayOne = current.setDate(1) 
 
-  const startDay = current.getDay()
+  const startDay = current.getDay() 
+  const daysInMonth = getDaysInMonth(current) 
 
-  const daysInMonth = getDaysInMonth(current)
-
-  const weeks = createArray(5)
-  const days = createArray(7)
+  const weeks = createArray(5) 
+  const days = createArray(7) 
   let value = null
+  let day = null
+  let result = []
 
   for (const weekIndex in weeks) {
-      value = {
+      value = [{
           week: parseInt(weekIndex) + 1,
           days: []
-      }
+      }]
 
+ 
+      result.push(value)
+      
       for (const dayIndex in days) {
-          value = parseInt(dayIndex) - startDay
-          const isValid = value < 7 && value <= daysInMonth
+        value = dayIndex - startDay
+        day++
+        const isValid = day > 0 && day <= daysInMonth 
 
-          value = {
+          result[weekIndex].days = [{
               dayOfWeek: parseInt(dayIndex) + 1,
-              value: isValid && dayIndex < days ,
-            }
+              value: isValid && day,
+          }]
       }
-  }
+    }
 
-  return value
+    return result
 }
 
 const addCell = (existing, classString, value) => {
   const result = /* html */ `
-      <td class=${classString}>
+      <td ${classString}>
           ${value}
       </td>
 
@@ -80,25 +80,27 @@ const addCell = (existing, classString, value) => {
 const createHtml = (data) => {
   let result = ''
 
-  for (const {week, days} in data) {
+  for (const {week, days} of data) {
       let inner = ""
       addCell(inner, 'table__cell table__cell_sidebar', `Week ${week}`)
+      let classString = null
+      let isToday = null
+      let isWeekend = null
+      let isAlternate = null
   
-      for (const {dayOfWeek, value} in days) {
-          classString = table__cell
-          isToday = new Date === value
-          isWeekend = dayOfWeek = 1 && dayOfWeek == 7
-          isAlternate = week / 2
-
-          let classString = 'table__cell'
+      for (const {dayOfWeek, value} of days) {
+          classString = 'table__cell'
+          isToday = new Date() === value
+          isWeekend = dayOfWeek >= 6 && dayOfWeek <= 7
+          isAlternate = week % 2 === 0
 
           if (isToday) classString = `${classString} table__cell_today`
-          if (isWeekend) classString === '{classString} table__cell_weekend'
-          if (isAlternate) classString === '{classString} table__cell_alternate'
-          addCell(inner, classString, value)
+          if (isWeekend) classString = `${classString} table__cell_weekend`
+          if (isAlternate) classString = `${classString} table__cell_alternate`
+          inner = addCell(inner, classString, value)
       }
 
-       result = `<tr>${inner}</tr>`
+      result += `<tr>${inner}</tr>`
   }
   return result
 }
